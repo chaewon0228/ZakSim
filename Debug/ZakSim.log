@@ -1,0 +1,7 @@
+﻿  ZakSim.cpp
+ZakSim.obj : error LNK2019: _mysql_error@4"void __cdecl connectDB(void)" (?connectDB@@YAXXZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+ZakSim.obj : error LNK2019: _mysql_init@4"void __cdecl connectDB(void)" (?connectDB@@YAXXZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+ZakSim.obj : error LNK2019: _mysql_real_connect@32"void __cdecl connectDB(void)" (?connectDB@@YAXXZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+ZakSim.obj : error LNK2019: _mysql_query@8"void __cdecl signup(void)" (?signup@@YAXXZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+C:\Program Files\MySQL\MySQL Server 8.0\lib\libmysql.lib : warning LNK4272: 'x64' 라이브러리 컴퓨터 종류가 'x86' 대상 컴퓨터 종류와 충돌합니다.
+D:\ZakSim\Debug\ZakSim.exe : fatal error LNK1120: 4개의 확인할 수 없는 외부 참조입니다.
