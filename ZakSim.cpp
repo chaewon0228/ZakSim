@@ -5,6 +5,9 @@
 #include <cstring>
 #include <Windows.h>
 #include <conio.h>
+#define YELLOW 14 
+#define WHITE 15 
+#define RED 4 
 #define SPACE 32   
 #define WAY_KEY 224
 using namespace std;
@@ -13,13 +16,40 @@ using namespace std;
 #pragma comment(lib, "libmysql.lib")
 void connectDB();
 
-MYSQL conn; //mysql Á¤º¸¸¦ ´ãÀ» ±¸Á¶Ã¼
+MYSQL conn; //mysql ±¸Á¶Ã¼
 MYSQL* connPtr = NULL; //mysql ÇÚµé
-MYSQL_RES* Result; //Äõ¸® ¼º°ø½Ã °á°ú¸¦ ´ã´Â ±¸Á¶Ã¼ Æ÷ÀÎÅÍ
+MYSQL_RES* Result; //±¸Á¶Ã¼ Æ÷ÀÎÅÍ
 MYSQL_ROW Row; //Äõ¸® ¼º°ø½Ã °á°ú·Î ³ª¿Â ÇàÀÇ Á¤º¸¸¦ ´ã´Â ±¸Á¶Ã¼
-int Stat; //Äõ¸® ¿äÃ» ÈÄ °á°ú (¼º°ø/½ÇÆÐ)
+int Stat; 
 
-// system("pause>null");
+class Database {
+public:
+	void set_ticket() {
+
+	}
+	void set_login() {
+
+	}
+	void set_seat() {
+
+	}
+	void get_residual_time() {
+
+	}
+	void get_all_ticket() {}
+	void trigger_ticketBuy() {
+
+	}
+	void set_ticketBuy() {
+
+	}
+	void get_purchase_list() {
+
+	}
+	void get_rentable_seat_list() {
+
+	}
+};
 enum MENU {
 	SIGNIN,
 	SIGNUP,
@@ -52,6 +82,7 @@ void DrawMenu() {
 	system("cls");
 
 	gotoxy(38, 1);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), YELLOW);
 	cout << "/\\_ /\\" << endl;
 	gotoxy(38, 2);
 	cout << "((@V@))" << endl;
@@ -72,19 +103,20 @@ void DrawMenu() {
 	cout << " _/ /__/ | _/ /   \\ \\_  _| |  \\ \\_  | \\____) | _| |_  _| |_\\/_| |_" << endl;
 	gotoxy(8, 10);
 	cout << "|________||____| |____||____||____|  \\______.'|_____||_____||_____|  " << endl;
-	gotoxy(11, 11);
+	gotoxy(12, 11);
 	cout << " ______   ______        _     ____  ____   ______   " << endl;
-	gotoxy(11, 12);
+	gotoxy(12, 12);
 	cout << "/ ____ `.|_   _ `.     / \\   |_  _||_  _|.' ____ \\  " << endl;
-	gotoxy(11, 13);
+	gotoxy(12, 13);
 	cout << "`'  __) |  | | `. \\   / _ \\    \\ \\  / /  | (___ \\_| " << endl;
-	gotoxy(11, 14);
+	gotoxy(12, 14);
 	cout << "_  |__ '.  | |  | |  / ___ \\    \\ \\/ /    _.____`.  " << endl;
-	gotoxy(11, 15);
+	gotoxy(12, 15);
 	cout << "| \\____)| _| |_.' /_/ /   \\ \\_  _|  |_   | \\____) | " << endl;
-	gotoxy(11, 16);
+	gotoxy(12, 16);
 	cout << "\\______.'|______.'|____| |____||______|   \\______.' " << endl;
 	gotoxy(21, 21);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
 	cout << "  ·Î ±× ÀÎ";
 	gotoxy(21, 23);
 	cout << " È¸ ¿ø °¡ ÀÔ";
@@ -131,40 +163,41 @@ MENU Control() {
 class User {
 protected:
 	string name, id, pw;
-	Manager m; studyCafe user;
 public:
 	User() { }
 	~User() { }
 	void signup() {
 		system("cls");
-		gotoxy(15, 8);
+		string in_name, in_id, in_pw;
+		gotoxy(12, 8);
 		cout << "  ______    _                    _____  _____        " << endl;
-		gotoxy(15, 9);
+		gotoxy(12, 9);
 		cout << ".' ____ \\  (_)                  |_   _||_   _|        " << endl;
-		gotoxy(15, 10);
+		gotoxy(12, 10);
 		cout << "| (___ \\_| __   .--./) _ .--.     | |    | | _ .--.   " << endl;
-		gotoxy(15, 11);
+		gotoxy(12, 11);
 		cout << " _.____`. [  | / /'`\\;[ `.-. |    | '    ' |[ '/'`\\ \\ " << endl;
-		gotoxy(15, 12);
+		gotoxy(12, 12);
 		cout << "| \\____) | | | \\ \\._// | | | |     \\ \\__/ /  | \\__/ | " << endl;
-		gotoxy(15, 13);
+		gotoxy(12, 13);
 		cout << " \\______.'[___].',__` [___||__]     `.__.'   | ;.__/  " << endl;
-		gotoxy(15, 14);
+		gotoxy(12, 14);
 		cout << "              ( ( __))                      [__|      " << endl;
 
-		gotoxy(21, 16);
-		cout << "ÀÌ¸§ : ";
-		cin >> name;
-		gotoxy(21, 18);
-		cout << "¾ÆÀÌµð : ";
-		cin >> id;
 		gotoxy(21, 20);
+		cout << "ÀÌ¸§ : ";
+		cin >> in_name;
+		gotoxy(21, 22);
+		cout << "¾ÆÀÌµð : ";
+		cin >> in_id;
+		gotoxy(21, 24);
 		cout << "ºñ¹Ð¹øÈ£ : ";
-		cin >> pw;
+		cin >> in_pw;
 
-		string Query = "insert into student(student_id, name, password) values('" + id + "', '" + name + "', '" + pw + "'); ";
+		name = in_name; id = in_id; pw = in_pw;
+		/*string Query = "insert into student(student_id, name, password) values('" + id + "', '" + name + "', '" + pw + "'); ";
 		Stat = mysql_query(connPtr, Query.c_str());
-		if (Stat != 0) fprintf(stderr, "Mysql quert error : %s\n", mysql_error(&conn));
+		if (Stat != 0) fprintf(stderr, "Mysql quert error : %s\n", mysql_error(&conn));*/
 		
 		/*Result = mysql_use_result(connPtr);
 		Stat = mysql_num_fields(Result);
@@ -173,11 +206,20 @@ public:
 				printf("%s ", Row[i] ? Row[i] : "NULL");
 			}
 		}*/
-		gotoxy(21, 30);
-		cout << "Press [ ENTER ] ";
+		/*
+		insert into ticket(time, storable, price) values(7200, false, 3000);
+		insert into ticket(time, storable, price) values(14400, false, 5000);
+		insert into ticket(time, storable, price) values(21600, false, 7000);
+		insert into ticket(time, storable, price) values(28800, false, 9000);
+		insert into ticket(time, storable, price) values(43200, false, 10000);
+		insert into ticket(time, storable, price) values(180000, true, 60000);
+		insert into ticket(time, storable, price) values(360000, true, 100000);
+		insert into ticket(time, storable, price) values(540000, true, 160000);
+		insert into ticket(time, storable, price) values(720000, true, 200000);
+		*/
 		mysql_close(connPtr);
 	}
-	void signin() {
+	int signin() {
 		system("cls");
 		string input_id, input_pw;
 		gotoxy(15, 8);
@@ -201,161 +243,21 @@ public:
 		cout << "ºñ¹Ð¹øÈ£ : ";
 		cin >> input_pw;
 
-		if (input_id == "admin" && input_pw == "1234") m.manager_print();
-		else if (input_id == name && input_pw == pw) user.user_print();
-
-		system("pause>null");
-	}
-};
-
-class studyCafe : public User {
-	int menu;
-public:
-	studyCafe() {}
-	~studyCafe() {}
-	// »ç¿ëÀÚ È­¸é Ãâ·Â 
-	int user_print() {
-		system("cls");
-		menu = 0;
-		gotoxy(15, 8);
-		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
-		gotoxy(15, 9);
-		cout << "¦¢             "<<name<<"´Ô È¯¿µÇÕ´Ï´Ù!        ¦¢";
-		gotoxy(15, 10);
-		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
-		gotoxy(20, 16);
-		cout << "1.  ÀÌ¿ë±Ç ±¸¸Å" << endl;
-		gotoxy(20, 20);
-		cout << "2.  ÁÂ¼®»óÅÂ È®ÀÎ ¹× ÀÔ½Ç" << endl;
-		gotoxy(20, 24);
-		cout << "3.  Åð½Ç" << endl;
-
-		while (1) {
-			gotoxy(15, 30);
-			cout << "¸Þ´º ÀÔ·Â >> ";
-			cin >> menu;
-			switch (menu) {
-			case 1: // ÀÌ¿ë±Ç ±¸¸Å
-				system("cls");
-				use_check();
-				break;
-			case 2: // ÁÂ¼® »óÅÂ
-				system("cls");
-				seat_state();
-				break;
-			case 3: // Åð½Ç
-				system("cls");
-				gotoxy(20, 18);
-				cout << "<<<<<< Åð½Ç ¿Ï·á >>>>>>" << endl;
-				Sleep(2000);
-				DrawMenu();
-				break;
-			default:
-				cout << "¸Þ´º ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù! ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä." << endl;
-			}
-		}
-	}
-	// ÀÌ¿ë±Ç È®ÀÎ Ãâ·Â
-	void use_check() {
-		system("cls");
-		menu = 0;
-		gotoxy(15, 8);
-		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
-		gotoxy(15, 9);
-		cout << "¦¢                ÀÌ¿ë±Ç ±¸¸Å               ¦¢";
-		gotoxy(15, 10);
-		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
-		gotoxy(20, 18);
-		cout << "1.  ÀÌ¿ë±Ç ±¸¸Å ¹× È®ÀÎ" << endl;
-		gotoxy(20, 20);
-		cout << "2.  È¨À¸·Î µ¹¾Æ±â±â " << endl;
-
-		gotoxy(18, 27);
-		cout << "¸Þ´º ÀÔ·Â >> ";
-		while (1) {
-			cin >> menu;
-			switch (menu) {
-			case 1:
-				use_buy();
-				break;
-			case 2:
-				user_print();
-			}
-		}
-	}
-	// ÀÌ¿ë±Ç ±¸¸Å
-	void use_buy() {
-		system("cls");
-		gotoxy(15, 8);
-		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
-		gotoxy(15, 9);
-		cout << "¦¢                ÀÌ¿ë±Ç ±¸¸Å               ¦¢";
-		gotoxy(15, 10);
-		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
-
-		gotoxy(22, 12);
-		cout << "½Ã°£ ³²À¸¼Ì½À´Ï´Ù. ±¸¸ÅÇÏ½Ç ÀÌ¿ë±ÇÀ» ¼±ÅÃÇØÁÖ¼¼¿ä!";
-
-		gotoxy(22, 14);
-		cout << "1. 2½Ã°£±Ç ±¸¸Å" << endl;
-		gotoxy(22, 16);
-		cout << "2. 6½Ã°£±Ç ±¸¸Å" << endl;
-		gotoxy(22, 18);
-		cout << "3. 10½Ã°£±Ç ±¸¸Å" << endl;
-		gotoxy(22, 20);
-		cout << "4. 14½Ã°£±Ç ±¸¸Å" << endl;
-		gotoxy(22, 22);
-		cout << "5. 18½Ã°£±Ç ±¸¸Å" << endl;
-		
-		int use_ticket = 0;
-		gotoxy(22, 24);
-		cout << "ÀÌ¿ë±Ç Á¾·ù ÀÔ·Â >> ";
-		cin >> use_ticket;
-
-		gotoxy(22, 26);
-		cout << use_ticket * 2 << "±ÇÀ» ±¸¸ÅÇÏ¼Ì½À´Ï´Ù!" << endl;
-
-		char YorN[5];
-		gotoxy(22, 37);
-		cout << "Ãß°¡ ±¸¸ÅÇÏ½Ã°Ú½À´Ï±î? (y/n)" << endl;
-		cin >> YorN;
-		if (strcmp(YorN,"y")==0) {
-			gotoxy(22, 24);
-			cout << "ÀÌ¿ë±Ç Á¾·ù ÀÔ·Â >> ";
-			cin >> use_ticket;
-		}
+		if (input_id == "admin" && input_pw == "1329") return 0;
+		else if (input_id == name && input_pw == pw) return 1;
 		else {
-			use_check();
+			gotoxy(9, 25);
+			cout << "·Î±×ÀÎ¿¡ ½ÇÆÐÇß½À´Ï´Ù! ¾ÆÀÌµð¿Í ºñ¹Ð¹øÈ£¸¦ ´Ù½Ã ÇÑ¹ø È®ÀÎÇØÁÖ¼¼¿ä.";
+			Sleep(2000);
+			signin();
 		}
-	}
-	// ÁÂ¼® »óÅÂ ÃÊ±âÈ­
-	void seat_reset(int a, int b) {
-
-	}
-	// ÀÔ½Ç 
-	void comeIn() {
-		int i = 0, j = 0;
-		gotoxy(15, 25);
-		cout << "ÀÚ¸® ÀÔ·Â : ";
-		cin >> j;
-
-		cout << endl << endl << endl << endl << endl << endl;
-		cout << "\t\t\t\t___________________________________________" << endl;
-		cout << "\t\t\t\t    ** ÀÌ ÁÂ¼®Àº ÀÌ¹Ì »ç¿ë ÁßÀÔ´Ï´Ù. **" << endl << endl;
-		cout << "\t\t\t\t      ** ´Ù¸¥ ÁÂ¼®À» ÀÌ¿ëÇØÁÖ¼¼¿ä. **" << endl;
-		cout << "\t\t\t\t___________________________________________" << endl;
-		cout << endl;
-
-		cout << "\t\t\t\t        <<<<<< ÀÔ½ÇÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù >>>>>>       " << endl;
-
 	}
 	// ÁÂ¼® »óÅÂ
 	void seat_state() {
 		system("cls");
 		int i, j;
 		int cnt = 0;
-
-		gotoxy(21, 8);
+		gotoxy(21, 5);
 		cout << " ¢·  ÁÂ¼® »óÅÂ  ¢¹ " << endl;
 
 		gotoxy(13, 15);
@@ -382,77 +284,219 @@ public:
 		}
 		gotoxy(13, 19);
 		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¥ ¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¥ ¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¥ ¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¥ ¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
-		comeIn();
 	}
+};
 
+class studyCafe : public User {
+	int menu;
+public:
+	studyCafe() {}
+	~studyCafe() {}
+	// »ç¿ëÀÚ È­¸é Ãâ·Â 
+	void user_print() {
+		system("cls");
+		menu = 0;
+		gotoxy(16, 5);
+		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
+		gotoxy(16, 6);
+		cout << "¦¢         È¸¿ø´Ô, ¹Ý°©½À´Ï´Ù!        ¦¢";
+		gotoxy(16, 7);
+		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
+		gotoxy(19, 15);
+		cout << "1.  ÀÌ¿ë±Ç ±¸¸Å" << endl;
+		gotoxy(19, 18);
+		cout << "2.  ÁÂ¼®»óÅÂ È®ÀÎ ¹× ÀÔ½Ç" << endl;
+		gotoxy(19, 21);
+		cout << "3.  Åð½Ç" << endl;
+
+		gotoxy(15, 30);
+		cout << "¸Þ´º ÀÔ·Â >> ";
+		cin >> menu;
+		switch (menu) {
+			case 1: // ÀÌ¿ë±Ç ±¸¸Å
+				use_check();
+				break;
+			case 2: // ÁÂ¼® »óÅÂ
+				seat_state();
+				comeIn();
+				break;
+			case 3: // Åð½Ç
+				system("cls");
+				gotoxy(20, 18);
+				cout << "<<<<<< Åð½Ç ¿Ï·á >>>>>>" << endl;
+				Sleep(2100);
+				DrawMenu();
+				break;
+			default:
+				cout << "¸Þ´º ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù! ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä." << endl;
+				Sleep(2000);
+				user_print();
+		}
+	}
+	// ÀÌ¿ë±Ç È®ÀÎ Ãâ·Â
+	void use_check() {
+		system("cls");
+		menu = 0;
+		gotoxy(14, 5);
+		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
+		gotoxy(14, 6);
+		cout << "¦¢                ÀÌ¿ë±Ç ±¸¸Å               ¦¢";
+		gotoxy(14, 7);
+		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
+		gotoxy(19, 15);
+		cout << "1.  ÀÌ¿ë±Ç ±¸¸Å ¹× È®ÀÎ" << endl;
+		gotoxy(19, 18);
+		cout << "2.  È¨À¸·Î µ¹¾Æ±â±â " << endl;
+
+		gotoxy(15, 30);
+		cout << "¸Þ´º ÀÔ·Â >> ";
+		cin >> menu;
+		switch (menu) {
+			case 1:
+				use_buy();
+				use_check();
+				break;
+			case 2:
+				user_print();
+				break;
+		}
+	}
+	// ÀÌ¿ë±Ç ±¸¸Å
+	int use_buy() {
+		int use_ticket, time = 2;
+		system("cls");
+		use_ticket = 0;
+		gotoxy(14, 5);
+		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
+		gotoxy(14, 6);
+		cout << "¦¢                ÀÌ¿ë±Ç ±¸¸Å               ¦¢";
+		gotoxy(14, 7);
+		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
+		gotoxy(10, 9);
+		cout << "½Ã°£ ³²À¸¼Ì½À´Ï´Ù. ±¸¸ÅÇÏ½Ç ÀÌ¿ë±ÇÀ» ¼±ÅÃÇØÁÖ¼¼¿ä!";
+		gotoxy(19, 12);
+		cout << "1. 2½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 14);
+		cout << "2. 4½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 16);
+		cout << "3. 6½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 18);
+		cout << "4. 12½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 20);
+		cout << "5. 50½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 22);
+		cout << "6. 100½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 24);
+		cout << "7. 150½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(19, 26);
+		cout << "8. 200½Ã°£±Ç ±¸¸Å" << endl;
+		gotoxy(15, 29);
+		cout << "ÀÌ¿ë±Ç Á¾·ù ÀÔ·Â >> ";
+		cin >> use_ticket;
+		gotoxy(19, 31);
+		if(use_ticket > 4) cout << 50 * use_ticket - 4 << "½Ã°£±ÇÀ» ±¸¸ÅÇÏ¼Ì½À´Ï´Ù!" << endl;
+		else cout << 2 + (2 * (use_ticket - 1)) << "½Ã°£±ÇÀ» ±¸¸ÅÇÏ¼Ì½À´Ï´Ù!" << endl;
+
+		char YorN[5];
+		gotoxy(19, 33);
+		cout << "Ãß°¡ ±¸¸ÅÇÏ½Ã°Ú½À´Ï±î? (y/n) => " ;
+		cin >> YorN;
+		if (YorN == "y") {
+			gotoxy(15, 37);
+			cout << "ÀÌ¿ë±Ç Á¾·ù ÀÔ·Â >> ";
+			cin >> use_ticket;
+		}
+		else if (YorN == "n") {
+			gotoxy(19, 35);
+			cout << "===== ÀÌ¿ë±Ç ±¸¸Å Á¾·á =====";
+			Sleep(1500);
+			return 0;
+		}
+	}
+	// ÁÂ¼® »óÅÂ ÃÊ±âÈ­
+	void seat_reset(int a, int b) {
+
+	}
+	// ÀÔ½Ç 
+	void comeIn() {
+		int seat_num = 0;
+		gotoxy(15, 23);
+		cout << "ÀÚ¸® ÀÔ·Â : ";
+		cin >> seat_num;
+
+		cout << endl << endl << endl << endl << endl << endl;
+		cout << "\t\t\t\t___________________________________________" << endl;
+		cout << "\t\t\t\t    ** ÀÌ ÁÂ¼®Àº ÀÌ¹Ì »ç¿ë ÁßÀÔ´Ï´Ù. **" << endl << endl;
+		cout << "\t\t\t\t      ** ´Ù¸¥ ÁÂ¼®À» ÀÌ¿ëÇØÁÖ¼¼¿ä. **" << endl;
+		cout << "\t\t\t\t___________________________________________" << endl;
+		cout << endl;
+		cout << "\t\t\t\t        <<<<<< ÀÔ½ÇÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù >>>>>>       " << endl;
+
+	}
 };
 class Manager : public User {
-	string id = "admin";
-	int pw = 1329;
 public:
 	Manager() {}
 	~Manager() { }
-
+	string get_id() { return id; }
+	string get_pw() { return pw; }
 	// °ü¸®ÀÚ È­¸é Ãâ·Â
-	int manager_print() {
+	void manager_print() {
 		system("cls");
-		int menu;
-
-		gotoxy(15, 8);
+		int menu = 0;
+		gotoxy(16, 5);
 		cout << "¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤" << endl;
-		gotoxy(15, 9);
+		gotoxy(16, 6);
 		cout << "¦¢             °ü¸®ÀÚ °èÁ¤            ¦¢";
-		gotoxy(15, 10);
+		gotoxy(16, 7);
 		cout << "¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥" << endl;
-		gotoxy(20, 18);
+		gotoxy(19, 17);
 		cout << "1. ÁÂ¼® »óÅÂ" << endl;
-		gotoxy(20, 20);
+		gotoxy(19, 21);
 		cout << "2. È¸¿ø º¸±â" << endl;
-		gotoxy(20, 22);
+		gotoxy(19, 25);
 		cout << "3. ¸ÅÃâ¾× È®ÀÎ" << endl;
 
-		while (1) {
-			gotoxy(15, 30);
-			cout << "¸Þ´º ÀÔ·Â >> ";
-			cin >> menu;
-			switch (menu) {
+		gotoxy(15, 30);
+		cout << "¸Þ´º ÀÔ·Â >> ";
+		cin >> menu;
+		switch (menu) {
 			case 1:
-				system("cls");
-				cout << "ÁÂ¼® »óÅÂ" << endl;
+				seat_state();
 				break;
 			case 2:
-
+				cout << "È¸¿ø º¸±â" << endl;
 				break;
 			case 3:
 				system("cls");
 				cout << "¸ÅÃâ¾× È®ÀÎ" << endl;
 				break;
 			default:
-				cout << "¸Þ´º ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù! ´Ù½Ã ÀÔ·ÂÇÏ¼¼¿ä" << endl;
-			}
+				cout << "¸Þ´º ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù! ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä." << endl;
+				Sleep(2000);
+				manager_print();
 		}
-		system("pause>null");
 	}
 };
-
 int main() {
 	CursorView();
 	SetConsoleView();
 	connectDB();
-	while (1) {
-		switch (Control()) {
+	User use;
+	Manager m; studyCafe s;
+	switch (Control()) {
 		case SIGNIN:
-			signin();
+			use.signin();
 			break;
 		case SIGNUP:
-			signup();
-			signin();
+			use.signup();
+			if (use.signin() == 0)  m.manager_print();
+			else s.user_print();
 			break;
 		case END:
 			cout << "\n\n\n\n\n           * * * * * * * * * * * * * * ÀÛ½É 3ÀÏÀ» Á¾·áÇÕ´Ï´Ù * * * * * * * * * * * * * * " << endl;
 			system("pause>null");
 			return 0;
-		}
 	}
 }
 void connectDB() {
