@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <ctime> 
-#include <cstring>
+#include <string>
 #include <Windows.h>
 #include <conio.h>
 #define YELLOW 14
@@ -24,6 +24,7 @@ void connectDB();
 
 class Database {
 public:
+	//ticket 값 초기화
 	void set_ticket() {
 		string Query = "insert into ticket(time, storable, price)";
 		Query += " values( 7200, false, 3000), (14400, false, 5000),";
@@ -36,6 +37,7 @@ public:
 			cout << stderr << "error : " << mysql_error(&conn);
 		}
 	}
+	//seat 값 초기화
 	void set_seat() {
 		char temp[10];
 		string Query = "insert into seat values";
@@ -52,20 +54,14 @@ public:
 			cout << stderr << "error : " << mysql_error(&conn);
 		}
 	}
-	//
-	void get_residual_time() {
-		string Query = "select student_id as ID, name as 이름, time_format(sec_to_time(residual_time), '%k시간 %i분 %s초') as 잔여이용시간 from student; # where student_id = '~~';";
+	//이용권 구매
+	void buyTicket(string id) {
+		string Query = "insert into Rent(student_id, seat_no) values('"+ id +"', 1);";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
-	//
-	void get_all_ticket() {
-		string Query = "select ticket_no as 이용권번호, time_format(sec_to_time(time), '%k시간 %i분 %s초') as 이용시간, if(storable, 'O', 'X') as 저장가능, format(price, 0) as 가격 from ticket;";
-		Stat = mysql_query(connPtr, Query.c_str());
-		Result = mysql_store_result(&conn);
-	}
-	
-	void trigger_ticketBuy() {  //사고 잔여 이용시간 update
+	//잔여 이용시간 갱신 트리거
+	void trigger_ticket() {  
 		string Query = "drop trigger if exists update_residual_time_after_purchase;";
 		Query += "create trigger update_residual_time_after_purchase";
 		Query += "after insert on purchase";
@@ -73,6 +69,12 @@ public:
 		Query += "update student";
 		Query += "set residual_time = residual_time + (select time from ticket where ticket_no = new.ticket_no)";
 		Query += "where student_id = new.student_id;";
+		Stat = mysql_query(connPtr, Query.c_str());
+		Result = mysql_store_result(&conn); 
+	}
+	//잔여 이용시간
+	void trigger_ticketBuy(string id) {
+		string Query = "select student_id as 학생ID, name as 이름, time_format(sec_to_time(resudual_time), '%k시간 %i분 %s초') as 잔여이용시간 from student where student_id = '"+ id +"';";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
@@ -238,7 +240,13 @@ public:
 		cout << "비밀번호 : ";
 		cin >> in_pw;
 
-		string Query = "insert into student(student_id, name, password) values('" + in_id + "', '" + in_name + "', '" + in_pw + "'); ";
+		time_t timer;
+		struct tm* t;
+		timer = time(NULL);
+		t = localtime(&timer);
+		string str = to_string(t->tm_year + 1900) + "-" + to_string(t->tm_mon + 1) + "-" + to_string(t->tm_mday) + "  " + to_string(t->tm_hour) + ":" + to_string(t->tm_min);
+
+		string Query = "insert into student(student_id, name, pw, join_date) values('" + in_id + "', '" + in_name + "', '" + in_pw + "', '"+str+"'); ";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 		if (Stat != 0) {
@@ -527,6 +535,7 @@ int main() {
 		case END:
 			cout << "\n\n\n\n\n           * * * * * * * * * * * * * * 작심 3일을 종료합니다 * * * * * * * * * * * * * * " << endl;
 			system("pause>null");
+			exit(0);
 			return 0;
 	}
 }
