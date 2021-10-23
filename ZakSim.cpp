@@ -20,24 +20,30 @@ MYSQL* connPtr = NULL; //mysql 핸들
 MYSQL_RES* Result; //구조체 포인터
 MYSQL_ROW Row; //쿼리 성공시 결과로 나온 행의 정보를 담는 구조체
 int Stat; 
+string input_id, name;
+int seat_num = 0;
 void connectDB();
+
+//set_ticket();
+//set_seat();
 
 class Database {
 public:
-	//ticket 값 초기화
+	// ticket 값 초기화
 	void set_ticket() {
-		string Query = "insert into ticket(time, storable, price)";
-		Query += " values( 7200, false, 3000), (14400, false, 5000),";
-		Query += "(21600, false, 7000), (28800, false, 9000),";
-		Query += "(43200, false, 10000), (180000, true, 60000),";
-		Query += "(360000, true, 100000), (540000, true, 160000), (720000, true, 200000);";
+		string Query = "insert into ticket(ticket_no, price, time)";
+		Query += " values(1, 3000, 7200), (2, 5000, 14400),";
+		Query += "(3, 7000, 21600), (4, 9000, 28800),";
+		Query += "(5, 43200, 10000), (6, 180000, 60000),";
+		Query += "(7, 360000, 100000), (8, 540000, 160000), (9, 720000, 200000);";
 
 		Stat = mysql_query(connPtr, Query.c_str());
 		if (Stat != 0) {
 			cout << stderr << "error : " << mysql_error(&conn);
 		}
 	}
-	//seat 값 초기화
+
+	// seat 값 초기화
 	void set_seat() {
 		char temp[10];
 		string Query = "insert into seat values";
@@ -46,22 +52,25 @@ public:
 			Query += "(";
 			_itoa(i, temp, 10);
 			Query += temp;
-			Query += "),";
+			Query += ", 1),";
 		}
-		Query += "(20);";
+		Query += "(20, 1);";
 		Stat = mysql_query(connPtr, Query.c_str());
 		if (Stat != 0) {
 			cout << stderr << "error : " << mysql_error(&conn);
+			Sleep(5000);
 		}
 	}
-	//이용권 구매
-	void buyTicket(string id) {
-		string Query = "insert into Rent(student_id, seat_no) values('"+ id +"', 1);";
+
+	// 이용권 구매
+	void buyTicket(string id, int ticket_no) {
+		string Query = "insert into purchase(student_id, ticket_no) values('"+ id +"', "+ to_string(ticket_no) +");";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
-	//잔여 이용시간 갱신 트리거
-	void trigger_ticket() {  
+
+	// 잔여 이용시간 갱신 트리거
+	void trigger_buyTicket() {  
 		string Query = "drop trigger if exists update_residual_time_after_purchase;";
 		Query += "create trigger update_residual_time_after_purchase";
 		Query += "after insert on purchase";
@@ -72,27 +81,38 @@ public:
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn); 
 	}
-	//잔여 이용시간
-	void trigger_ticketBuy(string id) {
+
+	// 잔여 이용시간
+	void get_ResidualTime(string id) {
 		string Query = "select student_id as 학생ID, name as 이름, time_format(sec_to_time(resudual_time), '%k시간 %i분 %s초') as 잔여이용시간 from student where student_id = '"+ id +"';";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
-	void get_purchase_list() {
-		string Query = "drop procedure if exists get_purchase_list;";
-		Query += "create procedure get_purchase_list(in s_id varchar(45))";
-		Query += "select Purchase.date 날짜, time_format(sec_to_time(Ticket.time), '%k시간 %i분 %s초') 이용시간, if(Ticket.storable, 'O', 'X') 저장가능 여부, format(Ticket.price, 0) 가격";
-		Query += "from Purchase, Ticket";
-		Query += "where Purchase.ticket_no = Ticket.ticket_no and Purchase.student_id = s_id";
-		Query += "order by Purchase.date;";
+
+	// 이용 금액
+	void get_money() {
+		string Query = "select sum(Ticket.price) from Purchase, Ticket where Purchase.ticket_no = Ticket.ticket_no;";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
-	void get_ok_seat_list() {
-		string Query = "drop procedure if exists show_rentable_seat_list;";
-		Query += "create procedure show_rentable_seat_list()";
-		Query += "select seat_no as 자리번호 from Seat where seat_no";
-		Query += "not in (select seat_no from Rent where isnull(real_end_date));";
+
+	// 구매한 티켓 번호 
+	void buyTicketNum(string id) {
+		string Query = "select ticket_no from purchase where student_id = '"+ id +"';";
+		Stat = mysql_query(connPtr, Query.c_str());
+		Result = mysql_store_result(&conn);
+	}
+
+	// 티켓 가격
+	void ticketPrice(int ticket_no) {
+		string Query = "select price from ticket where ticket_no = "+ to_string(ticket_no) +"; ";
+		Stat = mysql_query(connPtr, Query.c_str());
+		Result = mysql_store_result(&conn);
+	}
+
+	// 퇴실
+	void outPut(int seat_no) {
+		string Query = "update seat set rent_q = 1 where seat_no = " + to_string(seat_no) + ";";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
@@ -212,6 +232,7 @@ class User {
 public:
 	User() { }
 	~User() { }
+
 	void signup() {
 		system("cls");
 		string in_name, in_id, in_pw;
@@ -244,22 +265,19 @@ public:
 		struct tm* t;
 		timer = time(NULL);
 		t = localtime(&timer);
-		string str = to_string(t->tm_year + 1900) + "-" + to_string(t->tm_mon + 1) + "-" + to_string(t->tm_mday) + "  " + to_string(t->tm_hour) + ":" + to_string(t->tm_min);
+		string str = to_string(t->tm_year + 1900) + "-" + to_string(t->tm_mon + 1) + "-" + to_string(t->tm_mday) + " " + to_string(t->tm_hour) + ":" + to_string(t->tm_min);
 
 		string Query = "insert into student(student_id, name, pw, join_date) values('" + in_id + "', '" + in_name + "', '" + in_pw + "', '"+str+"'); ";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 		if (Stat != 0) {
 			cout << stderr << "error : " << mysql_error(&conn);
+			Sleep(9000);
 		}
-		db.set_ticket();
-		db.set_seat();
-
-		mysql_close(connPtr);
 	}
 	int signin() {
 		system("cls");
-		string input_id, input_pw;
+		string input_pw;
 		gotoxy(15, 8);
 		cout << "  _____                      _            " << endl;
 		gotoxy(15, 9);
@@ -283,55 +301,70 @@ public:
 
 		string Query = "SELECT * FROM student where student_id = '"+input_id+"';";
 		Stat = mysql_query(connPtr, Query.c_str());
-		Result = mysql_store_result(&conn);
-		/*while ((Row = mysql_fetch_row(Result)) != NULL) {
-			if (input_id == Row[0]) return 1;
-		}*/
-		if (input_id == "admin" && input_pw == "1329") return 0;
-		else if (input_id == "A") return 1;
-		else {
-			gotoxy(9, 25);
-			cout << "로그인에 실패했습니다! 아이디와 비밀번호를 다시 한번 확인해주세요.";
-			Sleep(2000);
-			signin();
+		if (Stat != 0) { 
+			fprintf(stderr, "error:%s", mysql_error(&conn));
+			Sleep(5000);
+		}
+		Result = mysql_store_result(connPtr);
+		while ((Row = mysql_fetch_row(Result)) != NULL) {
+			name = Row[1];
+			if (input_id == "admin" && input_pw == "1329") return 0;
+			else if (input_id == Row[0] && input_pw == Row[2]) return 1; 
+			else if (input_pw != Row[2] && input_id == Row[0]) {
+				gotoxy(9, 25);
+				cout << "비밀번호가 일치하지 않습니다! 다시 입력해주세요.";
+				Sleep(2000);
+				signin();
+			}
+			else if (input_id != Row[0] && input_pw == Row[2]) {
+				gotoxy(9, 25);
+				cout << "아이디가 일치하지 않습니다! 다시 입력해주세요.";
+				Sleep(2000);
+				signin();
+			}
+			else {
+				gotoxy(9, 25);
+				cout << "로그인에 실패했습니다! 아이디와 비밀번호를 다시 한번 확인해주세요.";
+				Sleep(2000);
+				signin();
+			}
 		}
 	}
 	// 좌석 상태
 	void seat_state() {
 		system("cls");
 		int i, j;
-		int cnt = 0;
+		int seat[20];
 		gotoxy(21, 5);
 		cout << " ◁  좌석 상태  ▷ " << endl;
 
-		gotoxy(13, 15);
-		cout << " ┌──01──┐ ┌──02──┐ ┌──03──┐ ┌──04──┐ ┌──05──┐ " << endl;
-		for (i = 0; i < 5; i++) {
-			for (j = 0; j < 5; j++) {
-				/*if (seat[i][j].state == 1) {
-					gotoxy(13, 16);
-					cout << "│";
-					gotoxy(13, 17);
-					cout << " ";
-					gotoxy(13, 18);
-					cout << "│";
+		string Query = "select * from seat where rent_q = " + to_string(seat_num) + ";";
+		Stat = mysql_query(connPtr, Query.c_str());
+		if (Stat != 0) {
+			fprintf(stderr, "error:%s", mysql_error(&conn));
+			Sleep(5000);
+		}
+		Result = mysql_store_result(&conn);
+		while ((Row = mysql_fetch_row(Result)) != NULL) {
+			for (i = 0; i < 5; i++) {
+				if (Row[i][1] == 0) {
+					seat[i] = 0;
+					cout << Row[i][1] << endl;
+					Sleep(7000);
 				}
 				else {
-					gotoxy(13, 16);
-					cout << "│";
-					gotoxy(13, 17);
-					cout << "사용중";
-					gotoxy(13, 18);
-					cout << "│";
-				}*/
+					seat[i] = 1;
+					cout << Row[i][1] << endl;
+					Sleep(7000);
+				}
 			}
 		}
-		gotoxy(13, 19);
-		cout << "└──────┘ └──────┘ └──────┘ └──────┘ └──────┘" << endl;
+		
 	}
 };
 
 class studyCafe : public User {
+	Database db;
 	int menu;
 public:
 	studyCafe() {}
@@ -343,7 +376,7 @@ public:
 		gotoxy(16, 5);
 		cout << "┌────────────────────────────────────┐" << endl;
 		gotoxy(16, 6);
-		cout << "│         회원님, 반갑습니다!        │";
+		cout << "│   "<< name << "    회원님, 반갑습니다!  │";
 		gotoxy(16, 7);
 		cout << "└────────────────────────────────────┘" << endl;
 		gotoxy(19, 15);
@@ -362,7 +395,6 @@ public:
 				break;
 			case 2: // 좌석 상태
 				seat_state();
-				comeIn();
 				break;
 			case 3: // 퇴실
 				system("cls");
@@ -440,6 +472,7 @@ public:
 		gotoxy(19, 31);
 		if(use_ticket > 4) cout << 50 * use_ticket - 4 << "시간권을 구매하셨습니다!" << endl;
 		else cout << 2 + (2 * (use_ticket - 1)) << "시간권을 구매하셨습니다!" << endl;
+		db.buyTicket(input_id, use_ticket);
 
 		char YorN[5];
 		gotoxy(19, 33);
@@ -449,6 +482,7 @@ public:
 			gotoxy(15, 37);
 			cout << "이용권 종류 입력 >> ";
 			cin >> use_ticket;
+			db.buyTicket(input_id, use_ticket);
 		}
 		else if (YorN == "n") {
 			gotoxy(19, 35);
@@ -459,19 +493,25 @@ public:
 	}
 	// 입실 
 	void comeIn() {
-		int seat_num = 0;
 		gotoxy(15, 23);
 		cout << "자리 입력 : ";
 		cin >> seat_num;
-
-		cout << endl << endl << endl << endl << endl << endl;
-		cout << "\t\t\t\t___________________________________________" << endl;
-		cout << "\t\t\t\t    ** 이 좌석은 이미 사용 중입니다. **" << endl << endl;
-		cout << "\t\t\t\t      ** 다른 좌석을 이용해주세요. **" << endl;
-		cout << "\t\t\t\t___________________________________________" << endl;
-		cout << endl;
-		cout << "\t\t\t\t        <<<<<< 입실이 완료되었습니다 >>>>>>       " << endl;
-
+	
+		string Query = "insert into Rent(student_id, seat_no) values('" + input_id + "',  " + to_string(seat_num) + "); ";
+		Query += "update seat set rent_q = 0 where seat_no = "+ to_string(seat_num) +";";
+		Stat = mysql_query(connPtr, Query.c_str());
+		if (Stat != 0) {
+			fprintf(stderr, "error:%s", mysql_error(&conn));
+			cout << endl << endl << endl << endl ;
+			cout << "\t\t\t\t___________________________________________" << endl;
+			cout << "\t\t\t\t    ** 이 좌석은 이미 사용 중입니다. **" << endl << endl;
+			cout << "\t\t\t\t      ** 다른 좌석을 이용해주세요. **" << endl;
+			cout << "\t\t\t\t___________________________________________" << endl;
+			cout << endl;
+			cout << "\t\t\t\t        <<<<<< 입실이 완료되었습니다 >>>>>>       " << endl;
+			Sleep(5000);
+		}
+		Result = mysql_store_result(connPtr);
 	}
 };
 class Manager : public User {
