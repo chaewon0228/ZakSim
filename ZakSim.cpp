@@ -12,6 +12,7 @@
 #define SPACE 32   
 #define WAY_KEY 224
 using namespace std;
+
 #include <mysql.h>
 #pragma comment(lib, "libmysql.lib")
 
@@ -20,12 +21,11 @@ MYSQL* connPtr = NULL; //mysql 핸들
 MYSQL_RES* Result; //구조체 포인터
 MYSQL_ROW Row; //쿼리 성공시 결과로 나온 행의 정보를 담는 구조체
 int Stat; 
-string input_id, name;
-int seat_num = 0;
 void connectDB();
 
-//set_ticket();
-//set_seat();
+string input_id, name;
+int seat_num = 0;
+
 
 class Database {
 public:
@@ -84,9 +84,7 @@ public:
 
 	// 잔여 이용시간
 	void get_ResidualTime(string id) {
-		string Query = "select student_id as 학생ID, name as 이름, time_format(sec_to_time(resudual_time), '%k시간 %i분 %s초') as 잔여이용시간 from student where student_id = '"+ id +"';";
-		Stat = mysql_query(connPtr, Query.c_str());
-		Result = mysql_store_result(&conn);
+		
 	}
 
 	// 이용 금액
@@ -117,6 +115,7 @@ public:
 		Result = mysql_store_result(&conn);
 	}
 };
+
 enum MENU {
 	SIGNIN,
 	SIGNUP,
@@ -144,6 +143,7 @@ void gotoxy(int x, int y) { // 좌표
 	Pos.Y = y;
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
 }
+
 // 로고 찍기
 void DrawMenu() {
 	system("cls");
@@ -191,6 +191,7 @@ void DrawMenu() {
 	cout << "    종 료" << endl;
 
 }
+
 // 메뉴 화살표
 void DrawArrow(int& x) {
 	if (x <= 0) x = 0;
@@ -224,6 +225,12 @@ MENU Control() {
 			}
 		}
 	}
+}
+
+// 메뉴 범위 벗어났을 때 
+void nothingMenu() {
+	cout << "메뉴 범위를 벗어났습니다! 다시 입력해주세요." << endl;
+	Sleep(2000);
 }
 
 // 사용자 클래스
@@ -330,6 +337,7 @@ public:
 			}
 		}
 	}
+
 	// 좌석 상태
 	void seat_state() {
 		system("cls");
@@ -369,14 +377,15 @@ class studyCafe : public User {
 public:
 	studyCafe() {}
 	~studyCafe() {}
+
 	// 사용자 화면 출력 
-	void user_print() {
+	int user_print() {
 		system("cls");
 		menu = 0;
 		gotoxy(16, 5);
 		cout << "┌────────────────────────────────────┐" << endl;
 		gotoxy(16, 6);
-		cout << "│   "<< name << "    회원님, 반갑습니다!  │";
+		cout << "│    "<< name << " 회원님, 반갑습니다!    │";
 		gotoxy(16, 7);
 		cout << "└────────────────────────────────────┘" << endl;
 		gotoxy(19, 15);
@@ -391,7 +400,7 @@ public:
 		cin >> menu;
 		switch (menu) {
 			case 1: // 이용권 구매
-				use_check();
+				if(use_check() == 0) user_print();
 				break;
 			case 2: // 좌석 상태
 				seat_state();
@@ -399,18 +408,17 @@ public:
 			case 3: // 퇴실
 				system("cls");
 				gotoxy(20, 18);
-				cout << "<<<<<< 퇴실 완료 >>>>>>" << endl;
+				cout << "<<<<<<<  퇴실 완료  >>>>>>>" << endl;
 				Sleep(2100);
-				DrawMenu();
-				break;
+				return 0;
 			default:
-				cout << "메뉴 범위를 벗어났습니다! 다시 입력해주세요." << endl;
-				Sleep(2000);
+				nothingMenu();
 				user_print();
 		}
 	}
+
 	// 이용권 확인 출력
-	void use_check() {
+	int use_check() {
 		system("cls");
 		menu = 0;
 		gotoxy(14, 5);
@@ -429,27 +437,45 @@ public:
 		cin >> menu;
 		switch (menu) {
 			case 1:
-				use_buy();
-				use_check();
+				if(use_buy() == 0) use_check();
 				break;
 			case 2:
-				user_print();
-				break;
+				return 0;
+			default: 
+				nothingMenu();
+				use_check();
 		}
 	}
 	// 이용권 구매
 	int use_buy() {
-		int use_ticket, time = 2;
 		system("cls");
-		use_ticket = 0;
+		int use_ticket = 0, time = 2;
+
 		gotoxy(14, 5);
 		cout << "┌──────────────────────────────────────────┐" << endl;
 		gotoxy(14, 6);
 		cout << "│                이용권 구매               │";
 		gotoxy(14, 7);
 		cout << "└──────────────────────────────────────────┘" << endl;
+
+		
 		gotoxy(10, 9);
-		cout << "시간 남으셨습니다. 구매하실 이용권을 선택해주세요!";
+
+		// 남은 시간 출력 
+		string Query = "select time_format(sec_to_time(resudual_time), '%k시간 %i분 %s초') from student where student_id = '" + input_id + "';";
+		Stat = mysql_query(connPtr, Query.c_str());
+
+		if (Stat != 0) {
+			fprintf(stderr, "error:%s", mysql_error(&conn));
+			Sleep(5000);
+		}
+		Result = mysql_store_result(&conn);
+
+		while ((Row = mysql_fetch_row(Result)) != NULL) {
+			cout << Row[0];
+		}
+
+		cout << " 남으셨습니다. 구매하실 이용권을 선택해주세요!";
 		gotoxy(19, 12);
 		cout << "1. 2시간권 구매" << endl;
 		gotoxy(19, 14);
@@ -466,13 +492,17 @@ public:
 		cout << "7. 150시간권 구매" << endl;
 		gotoxy(19, 26);
 		cout << "8. 200시간권 구매" << endl;
+
 		gotoxy(15, 29);
 		cout << "이용권 종류 입력 >> ";
 		cin >> use_ticket;
+
 		gotoxy(19, 31);
 		if(use_ticket > 4) cout << 50 * use_ticket - 4 << "시간권을 구매하셨습니다!" << endl;
 		else cout << 2 + (2 * (use_ticket - 1)) << "시간권을 구매하셨습니다!" << endl;
+		// 구매 테이블
 		db.buyTicket(input_id, use_ticket);
+		db.trigger_buyTicket();
 
 		char YorN[5];
 		gotoxy(19, 33);
@@ -486,7 +516,7 @@ public:
 		}
 		else if (YorN == "n") {
 			gotoxy(19, 35);
-			cout << "===== 이용권 구매 종료 =====";
+			cout << "============= 이용권 구매 종료 ==============";
 			Sleep(1500);
 			return 0;
 		}
@@ -497,27 +527,34 @@ public:
 		cout << "자리 입력 : ";
 		cin >> seat_num;
 	
+		// 자리 대여
 		string Query = "insert into Rent(student_id, seat_no) values('" + input_id + "',  " + to_string(seat_num) + "); ";
 		Query += "update seat set rent_q = 0 where seat_no = "+ to_string(seat_num) +";";
 		Stat = mysql_query(connPtr, Query.c_str());
+
+
 		if (Stat != 0) {
-			fprintf(stderr, "error:%s", mysql_error(&conn));
 			cout << endl << endl << endl << endl ;
 			cout << "\t\t\t\t___________________________________________" << endl;
-			cout << "\t\t\t\t    ** 이 좌석은 이미 사용 중입니다. **" << endl << endl;
+			cout << "\t\t\t\t    ** 이 좌석은 이미 사용 중입니다! **" << endl << endl;
 			cout << "\t\t\t\t      ** 다른 좌석을 이용해주세요. **" << endl;
-			cout << "\t\t\t\t___________________________________________" << endl;
+			cout << "\t\t\t\t-------------------------------------------" << endl;
 			cout << endl;
-			cout << "\t\t\t\t        <<<<<< 입실이 완료되었습니다 >>>>>>       " << endl;
 			Sleep(5000);
+		}
+		else {
+			cout << "\t\t\t\t        <<<<<< 입실이 완료되었습니다 >>>>>>       " << endl;
+			Sleep(4000);
 		}
 		Result = mysql_store_result(connPtr);
 	}
 };
+
 class Manager : public User {
 public:
 	Manager() {}
 	~Manager() { }
+
 	// 관리자 화면 출력
 	void manager_print() {
 		system("cls");
@@ -538,6 +575,7 @@ public:
 		gotoxy(15, 30);
 		cout << "메뉴 입력 >> ";
 		cin >> menu;
+
 		switch (menu) {
 			case 1:
 				seat_state();
@@ -550,8 +588,7 @@ public:
 				cout << "매출액 확인" << endl;
 				break;
 			default:
-				cout << "메뉴 범위를 벗어났습니다! 다시 입력해주세요." << endl;
-				Sleep(2000);
+				nothingMenu();
 				manager_print();
 		}
 	}
@@ -560,16 +597,23 @@ int main() {
 	CursorView();
 	SetConsoleView();
 	connectDB();
+
 	User use;
 	Manager m; studyCafe s;
+
 	switch (Control()) {
 		case SIGNIN:
-			if (use.signin() == 0)  m.manager_print();
-			else s.user_print();
+			if (use.signin() == 0)  
+				m.manager_print();
+			else {
+				if(s.user_print() == 0) DrawMenu();
+			}
+			Control();
 			break;
 		case SIGNUP:
 			use.signup();
-			if (use.signin() == 0)  m.manager_print();
+			if (use.signin() == 0)  
+				m.manager_print();
 			else s.user_print();
 			break;
 		case END:
@@ -579,6 +623,7 @@ int main() {
 			return 0;
 	}
 }
+
 void connectDB() {
 	mysql_init(&conn);
 	connPtr = mysql_real_connect(&conn, "localhost", "root", "hope@153", "studyCafe", 3306, NULL, 0);
