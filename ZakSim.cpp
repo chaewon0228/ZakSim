@@ -82,11 +82,6 @@ public:
 		Result = mysql_store_result(&conn); 
 	}
 
-	// 잔여 이용시간
-	void get_ResidualTime(string id) {
-		
-	}
-
 	// 이용 금액
 	void get_money() {
 		string Query = "select sum(Ticket.price) from Purchase, Ticket where Purchase.ticket_no = Ticket.ticket_no;";
@@ -355,14 +350,14 @@ public:
 		Result = mysql_store_result(&conn);
 		while ((Row = mysql_fetch_row(Result)) != NULL) {
 			for (i = 0; i < 5; i++) {
-				if (Row[i][1] == 0) {
+				if (Row[i] == 0) {
 					seat[i] = 0;
-					cout << Row[i][1] << endl;
+					cout << Row[i] << endl;
 					Sleep(7000);
 				}
 				else {
 					seat[i] = 1;
-					cout << Row[i][1] << endl;
+					cout << Row[i] << endl;
 					Sleep(7000);
 				}
 			}
@@ -521,6 +516,7 @@ public:
 			return 0;
 		}
 	}
+
 	// 입실 
 	void comeIn() {
 		gotoxy(15, 23);
@@ -531,7 +527,6 @@ public:
 		string Query = "insert into Rent(student_id, seat_no) values('" + input_id + "',  " + to_string(seat_num) + "); ";
 		Query += "update seat set rent_q = 0 where seat_no = "+ to_string(seat_num) +";";
 		Stat = mysql_query(connPtr, Query.c_str());
-
 
 		if (Stat != 0) {
 			cout << endl << endl << endl << endl ;
@@ -571,6 +566,8 @@ public:
 		cout << "2. 회원 보기" << endl;
 		gotoxy(19, 25);
 		cout << "3. 매출액 확인" << endl;
+		gotoxy(19, 29);
+		cout << "4. 문의 사항" << endl;
 
 		gotoxy(15, 30);
 		cout << "메뉴 입력 >> ";
@@ -587,11 +584,16 @@ public:
 				system("cls");
 				cout << "매출액 확인" << endl;
 				break;
+			case 4:
+				system("cls");
+				cout << "문의 사항 확인" << endl;
+				break;
 			default:
 				nothingMenu();
 				manager_print();
 		}
 	}
+	
 };
 int main() {
 	CursorView();
