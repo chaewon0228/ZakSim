@@ -143,46 +143,45 @@ void gotoxy(int x, int y) { // 좌표
 void DrawMenu() {
 	system("cls");
 
-	gotoxy(38, 1);
+	gotoxy(34, 3);
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BROWN);
 	cout << "/\\_ /\\" << endl;
-	gotoxy(38, 2);
+	gotoxy(34, 4);
 	cout << "((@V@))" << endl;
-	gotoxy(38, 3);
-	cout << "():::()" << endl;
-	gotoxy(38, 4);
-	cout << "VV - VV" << endl;
 
-	gotoxy(8, 5);
-	cout << " ________       _       ___  ____     ______   _____  ____    ____    " << endl;
-	gotoxy(8, 6);
-	cout << "|  __   _|     / \\     |_  ||_  _|  .' ____ \\ |_   _||_   \\  /   _|  " << endl;
-	gotoxy(8, 7);
-	cout << "|_/  / /      / _ \\      | |_/ /    | (___ \\_|  | |    |   \\/   |    " << endl;
-	gotoxy(8, 8);
-	cout << "   .'.' _    / ___ \\     |  __'.     _.____`.   | |    | |\\  /| |    " << endl;
-	gotoxy(8, 9);
-	cout << " _/ /__/ | _/ /   \\ \\_  _| |  \\ \\_  | \\____) | _| |_  _| |_\\/_| |_" << endl;
-	gotoxy(8, 10);
-	cout << "|________||____| |____||____||____|  \\______.'|_____||_____||_____|  " << endl;
-	gotoxy(12, 11);
-	cout << " ______   ______        _     ____  ____   ______   " << endl;
-	gotoxy(12, 12);
-	cout << "/ ____ `.|_   _ `.     / \\   |_  _||_  _|.' ____ \\  " << endl;
-	gotoxy(12, 13);
-	cout << "`'  __) |  | | `. \\   / _ \\    \\ \\  / /  | (___ \\_| " << endl;
-	gotoxy(12, 14);
-	cout << "_  |__ '.  | |  | |  / ___ \\    \\ \\/ /    _.____`.  " << endl;
-	gotoxy(12, 15);
-	cout << "| \\____)| _| |_.' /_/ /   \\ \\_  _|  |_   | \\____) | " << endl;
-	gotoxy(12, 16);
-	cout << "\\______.'|______.'|____| |____||______|   \\______.' " << endl;
-	gotoxy(21, 21);
+	gotoxy(13, 5);
+	cout << "   ______  __                      _      ():::()" << endl;
+	gotoxy(13, 6);
+	cout << " .' ___  |[  |                    (_)     VV - VV" << endl;
+	gotoxy(13, 7);
+	cout << "/ .'   \\_| | |--.   .--.   .--.   __   _ .--..--.  " << endl;
+	gotoxy(13, 8);
+	cout << "| |        | .-. |/ .'`\\ \\( (`\\] [  | [ `.-. .-. |" << endl;
+	gotoxy(13, 9);
+	cout << "\\ `.___.'\\ | | | || \\__. | `'.'.  | |  | | | | | | " << endl;
+	gotoxy(13, 10);
+	cout << " `.____ .'[___]|__]'.__.' [\\__) )[___][___||__||__] " << endl;
+	gotoxy(9, 11);
+	cout << "        _                  __              ______           ___        " << endl;
+	gotoxy(9, 12);
+	cout << "       / |_               |  ]           .' ___  |        .' ..]       " << endl;
+	gotoxy(9, 13);
+	cout << " .--. `| |-'__   _    .--.| |   _   __  / .'   \\_| ,--.  _| |_  .---.  " << endl;
+	gotoxy(9, 14);
+	cout << "( (`\\] | | [  | | | / /'`\\' |  [ \\ [  ] | |       `'_\\ :'-| |-'/ /__\\\\ " << endl;
+	gotoxy(9, 15);
+	cout << " `'.'. | |, | \\_/ |,| \\__/  |   \\ '/ /  \\ `.___.'\\// | |, | |  | \\__., " << endl;
+	gotoxy(9, 16);
+	cout << "[\\__) )\\__/ '.__.'_/ '.__.;__][\\_:  /    `.____ .'\\'-;__/[___]  '.__.' " << endl;
+	gotoxy(9, 17);
+	cout << "                               \\__.'                                   " << endl;
+
+	gotoxy(22, 22);
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
 	cout << "  로 그 인";
-	gotoxy(21, 23);
+	gotoxy(22, 24);
 	cout << " 회 원 가 입";
-	gotoxy(21, 25);
+	gotoxy(22, 26);
 	cout << "    종 료" << endl;
 
 }
@@ -191,7 +190,7 @@ void DrawMenu() {
 void DrawArrow(int& x) {
 	if (x <= 0) x = 0;
 	else if (x >= 2) x = 2;
-	gotoxy(20, 21 + x * 2);
+	gotoxy(21, 22 + x * 2);
 	cout << "▷";
 }
 // 메뉴 화살표 옮기기
