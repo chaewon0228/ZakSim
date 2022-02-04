@@ -1,16 +1,13 @@
 ﻿  ZakSim.cpp
-D:\ZakSim\ZakSim\ZakSim.cpp(133,10): error C3646: 'm': 알 수 없는 재정의 지정자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(133,11): error C4430: 형식 지정자가 없습니다. int로 가정합니다. 참고: C++에서는 기본 int를 지원하지 않습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(133,23): error C3646: 'user': 알 수 없는 재정의 지정자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(133,27): error C4430: 형식 지정자가 없습니다. int로 가정합니다. 참고: C++에서는 기본 int를 지원하지 않습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(185,3): error C2065: 'Manager': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(185,11): error C2146: 구문 오류: ';'이(가) 'm' 식별자 앞에 없습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(185,11): error C2065: 'm': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(186,3): error C2065: 'studyCafe': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(186,13): error C2146: 구문 오류: ';'이(가) 's' 식별자 앞에 없습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(186,13): error C2065: 's': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(209,48): error C2065: 'm': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(210,8): error C2065: 's': 선언되지 않은 식별자입니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(455,4): error C3861: 'signin': 식별자를 찾을 수 없습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(458,4): error C3861: 'signup': 식별자를 찾을 수 없습니다.
-D:\ZakSim\ZakSim\ZakSim.cpp(459,4): error C3861: 'signin': 식별자를 찾을 수 없습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(777,18): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(779,18): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(781,9): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(1061,11): warning C4101: 'db' :참조되지 않은 지역 변수입니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(667): warning C4715: 'User::signin': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(798): warning C4715: 'studyCafe::user_print': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(1039): warning C4715: 'Manager::manager_print': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(828): warning C4715: 'studyCafe::use_check': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(92): warning C4715: 'Database::residual_time': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(109): warning C4715: 'Database::residual_time_int': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\ZakSim\ZakSim\ZakSim.cpp(913): warning C4715: 'studyCafe::use_buy': 모든 제어 경로에서 값을 반환하지는 않습니다.
+  ZakSim.vcxproj -> D:\ZakSim\x64\Debug\ZakSim.exe

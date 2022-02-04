@@ -321,7 +321,15 @@ public:
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
-	
+	void logout() {
+		input_id = "";
+		
+	}
+	void out(string id) {
+		string Query = "delete student set rent_q = 1 where seat_no = any(select seat_no from rent where student_id = '" + id + "');";
+		Stat = mysql_query(connPtr, Query.c_str());
+		Result = mysql_store_result(&conn);
+	}
 	void insert(string id) {
 		string Query = " insert into qa(student_id, q, a) values('"+id+"', '. . .', '. . .');";
 		Stat = mysql_query(connPtr, Query.c_str());
@@ -332,6 +340,7 @@ public:
 		}
 		Result = mysql_store_result(&conn);
 	}
+	
 	// 문의 사항 Q
 	void update_Q(string q, string id) {
 		string Query = "update qa set q ='"+ q + "' where student_id = '" + id + "'; ";
@@ -1064,30 +1073,34 @@ int main() {
 	
 	// 초기화
 	//db.set_ticket();
-	///db.set_seat();
+	//db.set_seat();
 	//db.insert(input_id);
+	while (true) {
+		switch (Control()) {
+			case SIGNIN:
 
-	switch (Control()) {
-		case SIGNIN:
-			if (use.signin() == 0) {
-				if(m.manager_print() == 0) main();
+				if (use.signin() == 0) {
+					m.manager_print();
+				}
+				else {
+					s.user_print();
+				}
+			
+				break;
+			case SIGNUP:
+				use.signup();
+				if (use.signin() == 0)
+					m.manager_print();
+				else s.user_print();
+				break;
+			case END:
+				cout << "\n\n\n\n\n  * * * * * * * * * * * * * * 초심 스터디카페 프로그램을 종료합니다! * * * * * * * * * * * * * * " << endl;
+				system("pause>null");
+				exit(0);
+				return 0;
 			}
-			else {
-				if (s.user_print() == 0) main();
-			}
-			break;
-		case SIGNUP:
-			use.signup();
-			if (use.signin() == 0)
-				m.manager_print();
-			else s.user_print();
-			break;
-		case END:
-			cout << "\n\n\n\n\n  * * * * * * * * * * * * * * 초심 스터디카페 프로그램을 종료합니다 * * * * * * * * * * * * * * " << endl;
-			system("pause>null");
-			exit(0);
-			return 0;
 	}
+	
 }
 
 void connectDB() {
