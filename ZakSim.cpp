@@ -325,8 +325,10 @@ public:
 		input_id = "";
 		
 	}
+
+	// È¸¿ø Å»Åð
 	void out(string id) {
-		string Query = "delete student set rent_q = 1 where seat_no = any(select seat_no from rent where student_id = '" + id + "');";
+		string Query = "delete from student where student_id = '" + id + "');";
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
