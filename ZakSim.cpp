@@ -323,7 +323,6 @@ public:
 	}
 	void logout() {
 		input_id = "";
-		
 	}
 
 	// 회원 탈퇴
@@ -432,6 +431,7 @@ public:
 enum MENU {
 	SIGNIN,
 	SIGNUP,
+	WITHDRAWAL,
 	END
 };
 enum KEYBOARD {
@@ -698,6 +698,12 @@ public:
 		cout << "│     "<< name << " 회원님, 반갑습니다!    │";
 		gotoxy(16, 7);
 		cout << "└────────────────────────────────────┘" << endl;
+
+		gotoxy(16, 9);
+		cout << " [잔여 이용시간은 ";
+		cout << db.residual_time();
+		cout << " 남으셨습니다. ]";
+
 		gotoxy(19, 15);
 		cout << "1.  이용권 구매" << endl;
 		gotoxy(19, 18);
@@ -706,6 +712,8 @@ public:
 		cout << "3.  문의 사항 접수하기" << endl;
 		gotoxy(19, 24);
 		cout << "4.  퇴실" << endl;
+		gotoxy(19, 27);
+		cout << "5.  회원탈퇴" << endl;
 		
 		gotoxy(15, 30);
 		cout << "메뉴 입력 >> ";
@@ -797,10 +805,15 @@ public:
 				gotoxy(18, 18);
 				cout << "<<<<<<<  퇴실 완료  >>>>>>>" << endl;
 				db.outPut(input_id);
+				db.logout();
 
 				Sleep(2100);
 				return 0;
-
+			case 5: // 회원탈퇴
+				system("cls");
+				gotoxy(18, 18);
+				cout << "<<<<<<<  회원탈퇴 완료  >>>>>>>" << endl;
+				break;
 			default:
 				nothingMenu();
 				user_print();
@@ -1095,6 +1108,10 @@ int main() {
 					m.manager_print();
 				else s.user_print();
 				break;
+			case WITHDRAWAL:
+				db.out(input_id);
+				cout << "\n\n\n\n\n                            ※ 회원을 탈퇴합니다! ※ " << endl;
+				system("pause>null");
 			case END:
 				cout << "\n\n\n\n\n  * * * * * * * * * * * * * * 초심 스터디카페 프로그램을 종료합니다! * * * * * * * * * * * * * * " << endl;
 				system("pause>null");
