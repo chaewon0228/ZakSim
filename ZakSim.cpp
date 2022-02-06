@@ -31,7 +31,7 @@ double duration;
 
 
 class Database {
-	// 대여 가능 여부 ( 0:사용중 / 1 : 미사용 )
+	// 대여 가능 여부 ( 0: 사용중 / 1 : 미사용 )
 	int possible[100];
 public:
 	// ticket 값 초기화
@@ -331,6 +331,7 @@ public:
 		Stat = mysql_query(connPtr, Query.c_str());
 		Result = mysql_store_result(&conn);
 	}
+	// 문의사항 초기화
 	void insert(string id) {
 		string Query = " insert into qa(student_id, q, a) values('"+id+"', '. . .', '. . .');";
 		Stat = mysql_query(connPtr, Query.c_str());
@@ -344,7 +345,8 @@ public:
 	
 	// 문의 사항 Q
 	void update_Q(string q, string id) {
-		string Query = "update qa set q ='"+ q + "' where student_id = '" + id + "'; ";
+		char* add = add_Q();
+		string Query = "update qa set q ='"+ (string)add + q + "' where student_id = '" + id + "'; ";
 		Stat = mysql_query(connPtr, Query.c_str());
 
 		if (Stat != 0) {
@@ -364,6 +366,7 @@ public:
 		}
 		Result = mysql_store_result(&conn);
 	}
+	// 전체 Q
 	void Q() {
 		string Query = "select * from qa";
 		Stat = mysql_query(connPtr, Query.c_str());
@@ -397,6 +400,21 @@ public:
 			//cout << " : " << Row[0] << endl;
 		}
 		
+	}
+	char* add_Q() {
+		string Query = "select q from qa where student_id = '" + input_id + "'; ";
+		Stat = mysql_query(connPtr, Query.c_str());
+
+		if (Stat != 0) {
+			fprintf(stderr, "error:%s", mysql_error(&conn));
+			Sleep(5000);
+		}
+		Result = mysql_store_result(&conn);
+
+		while ((Row = mysql_fetch_row(Result)) != NULL) {
+			char* t = Row[0];
+			return t;
+		}
 	}
 	// 문의 사항 QA
 	void show_A() {
@@ -680,7 +698,7 @@ public:
 class studyCafe : public User {
 	Database db;
 	int h = 0, m = 0, s = 0;
-	int menu;
+	int menu = 0;
 	int mi = 0;
 	string q="";
 	int input;
@@ -719,10 +737,11 @@ public:
 		cout << "메뉴 입력 >> ";
 		cin >> menu;
 		switch (menu) {
-			case 1: // 이용권 구매
-				if(use_check() == 0) user_print();
+			case 1: {// 이용권 구매
+				if (use_check() == 0) user_print();
 				break;
-			case 2: // 좌석 상태
+			}
+			case 2: {// 좌석 상태
 				system("cls");
 				if (db.residual_time() == "0시간 0분 0초") {
 					gotoxy(20, 18);
@@ -745,7 +764,8 @@ public:
 					else user_print();
 				}
 				break;
-			case 3:
+			}
+			case 3: {
 				system("cls");
 				cin.ignore(256, '\n');
 				gotoxy(16, 5);
@@ -760,18 +780,20 @@ public:
 				db.show_Q();
 				cout << endl << "\t\t =>";
 				getline(cin, q);
+
+				string addQ = db.add_Q();
 				db.update_Q(q, input_id);
 
-				cout << endl << endl << endl <<"\t\t\t\t\t\t\t  =>  ";
+				cout << endl << endl << endl << "\t\t\t\t\t\t\t  =>  ";
 				db.show_A();
 
 				gotoxy(16, 30);
 				cout << "문의 사항 접수 완료.........";
-				
+
 
 				cout << "\n\n\t\t\t문의사항을 종료하시려면 [SPACE] 를 누르세요.";
 
-				
+
 				input = _getch();
 				if (input == SPACE) {
 					gotoxy(15, 33);
@@ -779,9 +801,10 @@ public:
 					Sleep(2500);
 					user_print();
 				}
-				
+
 				break;
-			case 4: // 퇴실
+			}
+			case 4: {// 퇴실
 				system("cls");
 
 				// 시간 측정 종료
@@ -797,7 +820,7 @@ public:
 				m = duration / 60;
 				duration = (int)duration % 60;
 				s = duration;
-				
+
 
 				gotoxy(18, 15);
 				cout << h << "시간 " << m << "분 " << s << "초 이용하셨습니다." << endl;
@@ -809,14 +832,17 @@ public:
 
 				Sleep(2100);
 				return 0;
-			case 5: // 회원탈퇴
+			}
+			case 5: {// 회원탈퇴
 				system("cls");
 				gotoxy(18, 18);
 				cout << "<<<<<<<  회원탈퇴 완료  >>>>>>>" << endl;
 				break;
-			default:
+			}
+			default: {
 				nothingMenu();
 				user_print();
+			}
 		}
 	}
 
@@ -1090,6 +1116,7 @@ int main() {
 	//db.set_ticket();
 	//db.set_seat();
 	//db.insert(input_id);
+
 	while (true) {
 		switch (Control()) {
 			case SIGNIN:
